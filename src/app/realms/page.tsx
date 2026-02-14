@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { REALM_INFO } from '@/lib/constants';
 import { type RealmName } from '@/types';
+import { getRealmRoute, getRealmClass } from '@/lib/utils';
 
 const realms = Object.entries(REALM_INFO) as [RealmName, typeof REALM_INFO[RealmName]][];
 
@@ -32,9 +33,9 @@ export default function RealmsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <Link href={`/realms/${key === 'gasing' ? 'lari-dalam-guni' : key}`}>
+              <Link href={getRealmRoute(key)}>
                 <div
-                  className={`game-card realm-${key === 'batu-seremban' ? 'seremban' : key === 'wau-bulan' ? 'wau' : key} p-8 h-full cursor-pointer group relative overflow-hidden`}
+                  className={`game-card ${getRealmClass(key)} p-8 h-full cursor-pointer group relative overflow-hidden`}
                 >
                   {/* Background icon */}
                   <div className="absolute -right-4 -bottom-4 text-[120px] opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">

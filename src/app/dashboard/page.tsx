@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { REALM_INFO, CURRENT_SEASON, SEASON_NAME } from '@/lib/constants';
 import { type RealmName } from '@/types';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, getRealmRoute, getRealmClass } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { calculateLevel } from '@/lib/gamification';
 
@@ -215,10 +215,10 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold mb-4">Choose Your Realm</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {realms.map(([key, realm], i) => (
-              <Link key={key} href={`/realms/${key === 'gasing' ? 'lari-dalam-guni' : key}`}>
+              <Link key={key} href={getRealmRoute(key)}>
                 <motion.div
                   whileHover={{ y: -4 }}
-                  className={`game-card realm-${key === 'batu-seremban' ? 'seremban' : key === 'wau-bulan' ? 'wau' : key} p-5 h-full cursor-pointer`}
+                  className={`game-card ${getRealmClass(key)} p-5 h-full cursor-pointer`}
                 >
                   <span className="text-3xl block mb-3">{realm.icon}</span>
                   <h3 className="font-bold text-lg mb-0.5">{realm.name}</h3>

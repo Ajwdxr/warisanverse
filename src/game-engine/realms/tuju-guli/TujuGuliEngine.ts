@@ -18,13 +18,11 @@ export class TujuGuliEngine extends BaseRealmEngine {
       
       // Init targets
       const marbles: Marble[] = [];
-      // Arrange in circle or triangle?
-      // Scatter random near center
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 12; i++) {
           marbles.push({
               id: `m-${i}`,
-              x: (Math.random() - 0.5) * 100,
-              y: (Math.random() - 0.5) * 100,
+              x: (Math.random() - 0.5) * 150,
+              y: (Math.random() - 0.5) * 150,
               radius: this.MARBLE_RADIUS,
               vx: 0,
               vy: 0,
@@ -34,30 +32,42 @@ export class TujuGuliEngine extends BaseRealmEngine {
           });
       }
 
-      // Striker (Place at edge, bottom)
-      const striker: Marble = {
+      // Player Striker
+      const playerStriker: Marble = {
           id: p1.id,
-          x: 0,
+          x: -50,
           y: this.ARENA_RADIUS - 40,
           radius: this.STRIKER_RADIUS,
           vx: 0,
           vy: 0,
-          color: '#ffffff', // White striker
+          color: '#ffffff',
           isDead: false,
           ownerId: p1.id
       };
 
+      // AI Striker
+      const aiStriker: Marble = {
+          id: 'ai',
+          x: 50,
+          y: this.ARENA_RADIUS - 40,
+          radius: this.STRIKER_RADIUS,
+          vx: 0,
+          vy: 0,
+          color: '#ffdd00', // Yellow striker for AI
+          isDead: false,
+          ownerId: 'ai'
+      };
+
       this.state = {
           marbles,
-          strikers: [striker],
+          strikers: [playerStriker, aiStriker],
           currentTurn: p1.id,
           phase: 'aiming',
-          scores: { [p1.id]: 0 },
+          scores: { [p1.id]: 0, 'ai': 0 },
           winnerId: null,
           arenaRadius: this.ARENA_RADIUS
       };
       
-      // Resolve initial overlaps
       this.resolveOverlaps();
   }
 
@@ -67,7 +77,7 @@ export class TujuGuliEngine extends BaseRealmEngine {
   }
 
   applyForce(id: string, forceX: number, forceY: number) {
-      if (this.state.phase !== 'aiming') return;
+      if (this.state.phase !== 'aiming' || this.state.currentTurn !== id) return;
       
       const striker = this.state.strikers.find(s => s.id === id);
       if (!striker) return;
@@ -82,14 +92,19 @@ export class TujuGuliEngine extends BaseRealmEngine {
 
       const dt = dtMs / 1000;
       let moving = false;
-      const allMarbles = [...this.state.marbles, ...this.state.strikers];
+      
+      // Filter out dead marbles for processing
+      const activeMarbles = this.state.marbles.filter(m => !m.isDead);
+      const allActive = [...activeMarbles, ...this.state.strikers];
+
+      // AI Thought Logic
+      if (this.state.phase === 'aiming' && this.state.currentTurn === 'ai') {
+          this.handleAITurn();
+          return;
+      }
 
       // Physics Loop
-      // Sub-steps for stability? 1 step for now.
-      
-      allMarbles.forEach(m => {
-          if (m.isDead) return;
-
+      allActive.forEach(m => {
           m.x += m.vx * dt;
           m.y += m.vy * dt;
 
@@ -104,19 +119,14 @@ export class TujuGuliEngine extends BaseRealmEngine {
               m.vy = 0;
           }
 
-          // Check Bounds (Circle)
+          // Check Bounds
           const dist = Math.sqrt(m.x*m.x + m.y*m.y);
-          if (dist > this.ARENA_RADIUS + m.radius) {
-              // Exited arena
+          if (dist > this.ARENA_RADIUS) {
               if (m.ownerId) {
-                  // Striker out -> Reset or Turn End?
-                  // For now, Striker stops at edge? No, rules say "Terkeluar".
-                  // Reset striker to start position for next shot
-                  m.isDead = true; // Temporary flag to handle removal/reset
+                  // Striker reset handled at end of move
               } else {
-                  // Target out -> Score!
+                  // Target out
                   m.isDead = true;
-                  // Who scored? Current turn player
                   if (this.state.scores[this.state.currentTurn] !== undefined) {
                       this.state.scores[this.state.currentTurn]++;
                   }
@@ -125,51 +135,94 @@ export class TujuGuliEngine extends BaseRealmEngine {
       });
 
       // Collisions
-        for (let i = 0; i < allMarbles.length; i++) {
-            for (let j = i + 1; j < allMarbles.length; j++) {
-                const a = allMarbles[i];
-                const b = allMarbles[j];
-                if (a.isDead || b.isDead) continue;
-                this.resolveCollision(a, b);
+        for (let i = 0; i < allActive.length; i++) {
+            for (let j = i + 1; j < allActive.length; j++) {
+                this.resolveCollision(allActive[i], allActive[j]);
             }
         }
 
-      // Handle Logic
+      // Turn Ending
       if (this.state.phase === 'moving' && !moving) {
-          // Reset Strikers if needed
+          this.state.phase = 'aiming';
+          
+          // Reset strikers that went out
           this.state.strikers.forEach(s => {
-             if (s.isDead) { // Went out
-                 s.isDead = false;
-                 // Reset position
-                 s.x = 0;
-                 s.y = this.ARENA_RADIUS - 40;
-                 s.vx = 0; 
-                 s.vy = 0;
-             }
-             // Or if it stayed in, keep it there?
-             // Usually Tuju Guli, you shoot from where you lie?
-             // Let's keep it simple: Striker stays where it is unless out.
+              const dist = Math.sqrt(s.x*s.x + s.y*s.y);
+              if (dist > this.ARENA_RADIUS - s.radius) {
+                  s.x = s.id === 'ai' ? 50 : -50;
+                  s.y = this.ARENA_RADIUS - 40;
+                  s.vx = 0;
+                  s.vy = 0;
+              }
           });
 
-          // Check Game Over
+          // Check Win Condition
           if (this.state.marbles.every(m => m.isDead)) {
-              this.state.winnerId = this.state.strikers[0].id; // Only 1 player logic for now
-              this._isGameOver = true;
+              this.determineWinner();
           } else {
-              this.state.phase = 'aiming';
-              // If multiplayer, switch turn here
+              // Switch Turn
+              const playerIds = this.state.strikers.map(s => s.id);
+              const currentIndex = playerIds.indexOf(this.state.currentTurn);
+              this.state.currentTurn = playerIds[(currentIndex + 1) % playerIds.length];
           }
       }
   }
 
+  private handleAITurn() {
+      // Small Delay before shooting
+      const target = this.state.marbles.find(m => !m.isDead);
+      if (!target) return;
+      
+      // Find nearest marble
+      const aiStriker = this.state.strikers.find(s => s.id === 'ai')!;
+      let nearestDist = Infinity;
+      let nearestMarble = target;
+      
+      this.state.marbles.forEach(m => {
+          if (m.isDead) return;
+          const d = Math.sqrt(Math.pow(m.x - aiStriker.x, 2) + Math.pow(m.y - aiStriker.y, 2));
+          if (d < nearestDist) {
+              nearestDist = d;
+              nearestMarble = m;
+          }
+      });
+
+      // Calculate vector to target
+      const dx = nearestMarble.x - aiStriker.x;
+      const dy = nearestMarble.y - aiStriker.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      
+      // Add some randomness/error
+      const errorX = (Math.random() - 0.5) * 15;
+      const errorY = (Math.random() - 0.5) * 15;
+      
+      const force = 400 + Math.random() * 200;
+      
+      setTimeout(() => {
+          this.applyForce('ai', (dx/dist) * force + errorX, (dy/dist) * force + errorY);
+      }, 1000);
+  }
+
+  private determineWinner() {
+      const pId = this.state.strikers.find(s => s.id !== 'ai')?.id || 'player';
+      const pScore = this.state.scores[pId] || 0;
+      const aiScore = this.state.scores['ai'] || 0;
+
+      if (pScore > aiScore) this.state.winnerId = pId;
+      else if (aiScore > pScore) this.state.winnerId = 'ai';
+      else this.state.winnerId = 'draw';
+      
+      this._isGameOver = true;
+  }
+
   resolveCollision(a: Marble, b: Marble) {
+      if (a.isDead || b.isDead) return;
       const dx = b.x - a.x;
       const dy = b.y - a.y;
       const dist = Math.sqrt(dx*dx + dy*dy);
       const minDist = a.radius + b.radius;
 
       if (dist < minDist) {
-          // Overlap separation
           const overlap = minDist - dist;
           const normalX = dx / dist;
           const normalY = dy / dist;
@@ -183,15 +236,13 @@ export class TujuGuliEngine extends BaseRealmEngine {
           b.x += normalX * overlap * (massA / totalMass);
           b.y += normalY * overlap * (massA / totalMass);
 
-          // Elastic Bounce
-          // Relative velocity
           const rvx = b.vx - a.vx;
           const rvy = b.vy - a.vy;
           const velAlongNormal = rvx * normalX + rvy * normalY;
 
-          if (velAlongNormal > 0) return; // Moving away
+          if (velAlongNormal > 0) return;
 
-          const restitution = 0.8; // Bounciness
+          const restitution = 0.8;
           const j = -(1 + restitution) * velAlongNormal;
           const impulse = j / (1/massA + 1/massB);
 
@@ -203,17 +254,18 @@ export class TujuGuliEngine extends BaseRealmEngine {
   }
 
   resolveOverlaps() {
-      // Simple relaxation loop
       for(let iter=0; iter<10; iter++) {
           let overlap = false;
           const all = [...this.state.marbles, ...this.state.strikers];
           for(let i=0; i<all.length; i++) {
+              if (all[i].isDead) continue;
               for(let j=i+1; j<all.length; j++) {
+                  if (all[j].isDead) continue;
                   const dx = all[j].x - all[i].x;
                   const dy = all[j].y - all[i].y;
                   const d = Math.sqrt(dx*dx + dy*dy);
                   if (d < all[i].radius + all[j].radius) {
-                      this.resolveCollision(all[i], all[j]); // Reuse collision logic to separate
+                      this.resolveCollision(all[i], all[j]);
                       overlap = true;
                   }
               }
@@ -225,5 +277,5 @@ export class TujuGuliEngine extends BaseRealmEngine {
   getState() { return JSON.parse(JSON.stringify(this.state)) as TujuGuliState; }
   protected checkGameOver(): boolean { return this._isGameOver; }
   calculateScore(): Record<string, number> { return this.state.scores; }
-  protected onReset(): void { this.onInitialize({ mode: 'solo', players: [{ id: this.state.strikers[0].id, username: 'Player', score:0, isAI:false, isActive:true }]}); }
+  protected onReset(): void { this.onInitialize({ mode: 'solo', players: [{ id: this.state.strikers.find(s=>s.id!=='ai')?.id || 'player', username: 'Player', score:0, isAI:false, isActive:true }]}); }
 }

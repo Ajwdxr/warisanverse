@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { REALM_INFO } from '@/lib/constants';
 import { type RealmName } from '@/types';
-import { getWinRate } from '@/lib/utils';
+import { getWinRate, getRealmRoute, getRealmClass } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { calculateLevel } from '@/lib/gamification';
 
@@ -310,8 +310,8 @@ export default function ProfilePage() {
                 const info = REALM_INFO[rp.realm];
                 if (!info) return null;
                 return (
-                  <Link key={rp.realm} href={`/realms/${rp.realm === 'gasing' ? 'lari-dalam-guni' : rp.realm}`}>
-                    <div className={`game-card realm-${rp.realm === 'batu-seremban' ? 'seremban' : rp.realm === 'wau-bulan' ? 'wau' : rp.realm} p-5 cursor-pointer`}>
+                  <Link key={rp.realm} href={getRealmRoute(rp.realm)}>
+                    <div className={`game-card ${getRealmClass(rp.realm)} p-5 cursor-pointer`}>
                       <div className="flex items-center gap-3 mb-3">
                         <span className="text-2xl">{info.icon}</span>
                         <div>

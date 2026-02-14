@@ -188,21 +188,21 @@ body {
     0 0 20px rgba(230, 126, 34, 0.3);
 }
 
-.realm-gasing:hover {
+.realm-guni:hover {
   border-color: rgba(52, 152, 219, 0.5);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     0 0 20px rgba(52, 152, 219, 0.3);
 }
 
-.realm-seremban:hover {
+.realm-pemadam:hover {
   border-color: rgba(155, 89, 182, 0.5);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     0 0 20px rgba(155, 89, 182, 0.3);
 }
 
-.realm-wau:hover {
+.realm-guli:hover {
   border-color: rgba(39, 174, 96, 0.5);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),

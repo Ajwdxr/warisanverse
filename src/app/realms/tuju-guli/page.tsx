@@ -71,13 +71,14 @@ export default function TujuGuliPage() {
       const uid = userIdRef.current;
       if (!uid) return;
       const state = engine.getState();
-      const score = state.scores['player'] || 0;
+      const playerScore = state.scores[uid] || state.scores['player'] || 0;
+      const aiScore = state.scores['ai'] || 0;
       
       const result = {
-          winnerId: uid,
-          scores: { [uid]: score, ai: 0 },
+          winnerId: state.winnerId === 'ai' ? 'ai' : (state.winnerId === 'draw' ? null : uid),
+          scores: { [uid]: playerScore, ai: aiScore },
           duration: 0, 
-          isDraw: false,
+          isDraw: state.winnerId === 'draw',
           xpEarned: 0,
           goldEarned: 0
       };
@@ -90,20 +91,19 @@ export default function TujuGuliPage() {
 
   // Input Handling
   const handlePointerDown = (e: React.PointerEvent) => {
-      if (!gameState || gameState.phase !== 'aiming') return;
+      if (!gameState || gameState.phase !== 'aiming' || gameState.currentTurn === 'ai') return;
 
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const clickX = e.clientX - rect.left - gameState.arenaRadius; // Center relative
+      const clickX = e.clientX - rect.left - gameState.arenaRadius;
       const clickY = e.clientY - rect.top - gameState.arenaRadius;
 
-      // Find if clicked on striker
-      const striker = gameState.strikers.find(s => s.id === 'player');
+      const striker = gameState.strikers.find(s => s.id !== 'ai');
       if (!striker) return;
 
       const dist = Math.sqrt(Math.pow(clickX - striker.x, 2) + Math.pow(clickY - striker.y, 2));
       
-      if (dist < striker.radius * 2) { // Generous hitbox
+      if (dist < striker.radius * 3) { 
           setDragStart({ x: striker.x, y: striker.y });
           setDragCurrent({ x: clickX, y: clickY });
       }
@@ -113,7 +113,6 @@ export default function TujuGuliPage() {
       if (!dragStart) return;
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      // Center relative coordinates
       const x = e.clientX - rect.left - (gameState?.arenaRadius || 0);
       const y = e.clientY - rect.top - (gameState?.arenaRadius || 0);
       setDragCurrent({ x, y });
@@ -124,8 +123,8 @@ export default function TujuGuliPage() {
       const dx = dragStart.x - dragCurrent.x;
       const dy = dragStart.y - dragCurrent.y;
       
-      const forceMult = 5; // Power multiplier
-      engineRef.current?.applyForce('player', dx * forceMult, dy * forceMult);
+      const forceMult = 5; 
+      engineRef.current?.applyForce(gameState?.currentTurn || 'player', dx * forceMult, dy * forceMult);
 
       setDragStart(null);
       setDragCurrent(null);
@@ -144,14 +143,15 @@ export default function TujuGuliPage() {
                   <div className="space-y-4 mb-8 text-left bg-gray-100 p-4 rounded-lg text-sm border-l-4 border-yellow-500">
                       <p>🎱 <strong>How to Play:</strong></p>
                       <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                          <li>Drag and shoot your white striker marble.</li>
-                          <li>Hit colored marbles OUT of the circle.</li>
-                          <li>Collect as many as you can!</li>
+                           <li>Take turns with the AI to knock marbles out.</li>
+                          <li>Drag your white striker to aim and shoot.</li>
+                          <li>Each marble knocked out is 1 point.</li>
+                          <li>Most points wins!</li>
                       </ul>
                   </div>
 
                   <button onClick={startGame} className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xl shadow-lg transition transform active:scale-95">
-                      START GAME
+                      START BATTLE
                   </button>
                   <Link href="/realms" className="block mt-4 text-gray-500 hover:text-gray-800">Exit</Link>
               </div>
@@ -169,7 +169,6 @@ export default function TujuGuliPage() {
       const power = Math.min(len / 200, 1);
       const color = power > 0.8 ? 'red' : 'green';
 
-      // Arrow position relative to center (0,0 is center of arena div)
       arrow = (
           <div 
              className={`absolute h-0 border-t-4 border-dashed border-${color}-500 origin-left z-20 pointer-events-none`}
@@ -187,7 +186,6 @@ export default function TujuGuliPage() {
 
   return (
       <div className="min-h-screen bg-stone-900 overflow-hidden flex items-center justify-center p-4 select-none">
-          {/* Floor Texture */}
           <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("/patterns/sand.png")', backgroundSize: '200px' }} />
 
           {/* Game Arena */}
@@ -206,11 +204,10 @@ export default function TujuGuliPage() {
           >
               <div className="absolute inset-0 pointer-events-none opacity-30" style={{ backgroundImage: 'url("/patterns/dirt.png")' }} />
               
-              {/* Center Hole */}
               <div className="absolute top-1/2 left-1/2 w-8 h-8 bg-black/40 rounded-full blur-[2px] transform -translate-x-1/2 -translate-y-1/2" />
               
               {/* Marbles */}
-              {gameState?.marbles.map(m => (
+              {gameState?.marbles.map(m => !m.isDead && (
                   <div 
                     key={m.id}
                     className="absolute rounded-full shadow-md"
@@ -230,16 +227,19 @@ export default function TujuGuliPage() {
               {gameState?.strikers.map(s => (
                   <div 
                     key={s.id}
-                    className="absolute rounded-full shadow-lg z-10"
+                    className={`absolute rounded-full shadow-lg z-10 ${gameState.currentTurn === s.id ? 'ring-4 ring-yellow-400 ring-offset-2' : ''}`}
                     style={{
                         left: s.x + RADIUS - s.radius,
                         top: s.y + RADIUS - s.radius,
                         width: s.radius * 2,
                         height: s.radius * 2,
-                        backgroundColor: 'white',
-                        background: `radial-gradient(circle at 30% 30%, #fff, #ddd, #999)`,
-                        boxShadow: '0 0 10px rgba(255,255,255,0.5), 2px 2px 5px rgba(0,0,0,0.5)',
-                        border: '2px solid white'
+                        background: s.id === 'ai' 
+                            ? `radial-gradient(circle at 30% 30%, #ffeb3b, #fbc02d, #f57f17)`
+                            : `radial-gradient(circle at 30% 30%, #fff, #ddd, #999)`,
+                        boxShadow: s.id === 'ai'
+                            ? '0 0 15px rgba(255,215,0,0.5), 2px 2px 5px rgba(0,0,0,0.5)'
+                            : '0 0 10px rgba(255,255,255,0.5), 2px 2px 5px rgba(0,0,0,0.5)',
+                        border: s.id === 'ai' ? '2px solid #fbc02d' : '2px solid white'
                     }}
                   />
               ))}
@@ -247,21 +247,49 @@ export default function TujuGuliPage() {
               {arrow}
 
               {/* HUD */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-1 rounded-full text-sm font-bold">
-                  Score: {gameState?.scores['player']}
+              <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-6 z-30">
+                  <div className={`bg-white/90 px-4 py-2 rounded-xl shadow-lg border-2 flex flex-col items-center min-w-[80px] ${gameState?.currentTurn !== 'ai' ? 'border-blue-500 scale-110' : 'border-gray-200 opacity-70'}`}>
+                      <span className="text-[10px] uppercase font-bold text-gray-500">You</span>
+                      <span className="text-xl font-black text-blue-600">{gameState?.scores[userId || 'player'] || 0}</span>
+                  </div>
+                  
+                  <div className="bg-stone-800 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">VS</div>
+
+                  <div className={`bg-white/90 px-4 py-2 rounded-xl shadow-lg border-2 flex flex-col items-center min-w-[80px] ${gameState?.currentTurn === 'ai' ? 'border-yellow-500 scale-110' : 'border-gray-200 opacity-70'}`}>
+                      <span className="text-[10px] uppercase font-bold text-gray-500">AI CPU</span>
+                      <span className="text-xl font-black text-yellow-600">{gameState?.scores['ai'] || 0}</span>
+                  </div>
               </div>
+
+               {/* Turn Status Message */}
+               {gameState?.phase === 'aiming' && (
+                  <div className={`absolute bottom-12 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full font-bold shadow-xl animate-bounce z-30
+                      ${gameState.currentTurn === 'ai' ? 'bg-yellow-500 text-black' : 'bg-blue-600 text-white'}
+                  `}>
+                      {gameState.currentTurn === 'ai' ? "AI is aiming..." : "Your Turn! Shoot!"}
+                  </div>
+               )}
           </div>
 
           {/* End Screen */}
           {phase === 'ended' && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-50">
-                   <div className="game-card bg-white p-8 rounded-xl text-center shadow-2xl animate-bounce-in max-w-sm">
-                       <h2 className="text-3xl font-bold mb-4 text-green-700">GAME OVER</h2>
-                       <p className="mb-6 text-xl">
-                           You collected <strong>{gameState?.scores['player']}</strong> marbles!
+                   <div className="game-card bg-white p-8 rounded-xl text-center shadow-2xl animate-bounce-in max-w-sm border-4 border-green-600">
+                       <h2 className="text-4xl font-black mb-2 italic uppercase">
+                           {gameState?.winnerId === 'ai' ? (
+                               <span className="text-red-600">AI Won!</span>
+                           ) : gameState?.winnerId === 'draw' ? (
+                               <span className="text-gray-600">Draw!</span>
+                           ) : (
+                               <span className="text-green-600">Victory!</span>
+                           )}
+                       </h2>
+                       <p className="mb-6 text-gray-600 font-bold">
+                           Final Score: {gameState?.scores[userId || 'player'] || 0} - {gameState?.scores['ai'] || 0}
                        </p>
+
                        {rewards && (
-                           <div className="bg-emerald-100 p-4 rounded-xl mb-4 shadow-inner border border-emerald-200">
+                           <div className="bg-emerald-100 p-4 rounded-xl mb-6 shadow-inner border border-emerald-200">
                                <p className="text-emerald-900 font-bold text-sm mb-1 uppercase tracking-wider">Rewards Earned</p>
                                <div className="flex justify-center gap-6 mt-2">
                                    <span className="text-indigo-950 font-black text-xl">+{rewards.xp} XP</span>
@@ -269,8 +297,11 @@ export default function TujuGuliPage() {
                                </div>
                            </div>
                        )}
-                       <button onClick={startGame} className="px-6 py-3 bg-green-600 text-white font-bold rounded hover:bg-green-700 w-full mb-2">Play Again</button>
-                       <Link href="/realms" className="block text-gray-500 hover:text-gray-800">Exit</Link>
+
+                       <div className="flex flex-col gap-2">
+                           <button onClick={startGame} className="px-6 py-3 bg-green-600 text-white font-bold rounded hover:bg-green-700 w-full">Rematch</button>
+                           <Link href="/realms" className="px-6 py-3 bg-gray-100 text-gray-500 font-bold rounded hover:bg-gray-200 w-full">Main Menu</Link>
+                       </div>
                    </div>
               </div>
           )}

@@ -60,6 +60,25 @@ export function getWinRate(wins: number, total: number): number {
   return Math.round((wins / total) * 100);
 }
 
+export function getRealmRoute(realm: string): string {
+  const routes: Record<string, string> = {
+    'gasing': 'lari-dalam-guni',
+    'batu-seremban': 'lawan-pemadam',
+    'wau-bulan': 'tuju-guli',
+  };
+  return `/realms/${routes[realm] || realm}`;
+}
+
+export function getRealmClass(realm: string): string {
+  const classes: Record<string, string> = {
+    'gasing': 'guni',
+    'batu-seremban': 'pemadam',
+    'wau-bulan': 'guli',
+    'congkak': 'congkak',
+  };
+  return `realm-${classes[realm] || realm}`;
+}
+
 export function playSound(soundPath: string, volume: number = 0.5): void {
   if (typeof window === 'undefined') return;
   try {
