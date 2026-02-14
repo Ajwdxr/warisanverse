@@ -171,13 +171,65 @@ export default function LariGuniPage() {
         onTouchEnd={handlePointerUp}
         onContextMenu={preventContextMenu}
       >
-          {/* Sky / Parallax Background */}
-          <div className="absolute inset-0 bg-[url('/patterns/clouds.png')] opacity-50 bg-repeat-x animate-drift" />
+          {/* Sky / Decorative Clouds */}
+          <div className="absolute inset-0 bg-gradient-to-b from-sky-400 to-sky-200" />
+          
+          {/* Static Clouds Decor (Parallax) */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* Far Clouds (Slow) */}
+            <div 
+              className="absolute top-10 flex gap-64 opacity-30"
+              style={{ transform: `translateX(${-camX * 0.1}px)` }}
+            >
+              {Array.from({ length: 20 }).map((_, i) => (
+                <img 
+                  key={`far-${i}`} 
+                  src="/images/cloud.png" 
+                  alt="cloud" 
+                  className="w-48 h-auto animate-drift"
+                  style={{ animationDelay: `${i * 2}s`, animationDuration: `${20 + i}s` }}
+                />
+              ))}
+            </div>
+
+            {/* Mid Clouds */}
+            <div 
+              className="absolute top-32 flex gap-48 opacity-60"
+              style={{ transform: `translateX(${-camX * 0.3}px)` }}
+            >
+              {Array.from({ length: 20 }).map((_, i) => (
+                <img 
+                  key={`mid-${i}`} 
+                  src="/images/cloud.png" 
+                  alt="cloud" 
+                  className="w-64 h-auto animate-drift-slow"
+                  style={{ animationDelay: `${i * 1.5}s`, animationDuration: `${15 + i}s` }}
+                />
+              ))}
+            </div>
+
+            {/* Near Clouds (Faster Parallax) */}
+            <div 
+              className="absolute top-56 flex gap-96 opacity-80"
+              style={{ transform: `translateX(${-camX * 0.6}px)` }}
+            >
+              {Array.from({ length: 20 }).map((_, i) => (
+                <img 
+                  key={`near-${i}`} 
+                  src="/images/cloud.png" 
+                  alt="cloud" 
+                  className="w-80 h-auto animate-drift-fast"
+                  style={{ animationDelay: `${i * 3}s`, animationDuration: `${12 + i}s` }}
+                />
+              ))}
+            </div>
+          </div>
           
           {/* Ground */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-amber-700 border-t-8 border-green-600">
-              {/* Grass pattern */}
-              <div className="w-full h-4 bg-green-500/50" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-amber-800 border-t-8 border-green-700">
+              {/* Grass details */}
+              <div className="w-full h-full opacity-30 bg-[url('/patterns/grass_tufts.png')] bg-repeat" />
+              <div className="absolute top-0 w-full h-6 bg-green-500/40" />
           </div>
 
           {/* Game World Container (Camera Transform) */}

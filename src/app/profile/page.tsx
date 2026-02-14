@@ -43,11 +43,53 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.refresh();
     router.push('/');
+  };
+
+  const handleUpdateUsername = async () => {
+    if (!newUsername.trim()) return;
+    if (newUsername === profile?.username) {
+      setIsEditing(false);
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) throw new Error('Not authenticated');
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ username: newUsername.trim() })
+        .eq('id', user.id);
+
+      if (updateError) {
+        if (updateError.code === '23505') {
+          throw new Error('Username already taken');
+        }
+        throw updateError;
+      }
+
+      setProfile(prev => prev ? { ...prev, username: newUsername.trim() } : null);
+      setIsEditing(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to update username');
+    } finally {
+      setSaving(false);
+    }
   };
 
   useEffect(() => {
@@ -69,7 +111,7 @@ export default function ProfilePage() {
 
       if (profileData) {
         const levelInfo = calculateLevel(profileData.xp || 0);
-        setProfile({
+        const data = {
           username: profileData.username || 'Warrior',
           level: levelInfo.level,
           xp: levelInfo.currentXP,
@@ -79,7 +121,9 @@ export default function ProfilePage() {
           totalMatches: profileData.total_matches || 0,
           totalWins: profileData.total_wins || 0,
           createdAt: profileData.created_at || '',
-        });
+        };
+        setProfile(data);
+        setNewUsername(data.username);
       }
 
       // Realm Progress
@@ -161,7 +205,49 @@ export default function ProfilePage() {
               <img src="/logo.png" alt="WarisanVerse Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-3xl font-bold">{displayProfile.username}</h1>
+              {isEditing ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-2xl font-bold focus:outline-none focus:border-primary-500/50 w-full max-w-[200px]"
+                      autoFocus
+                      maxLength={15}
+                    />
+                    <button
+                      onClick={handleUpdateUsername}
+                      disabled={saving}
+                      className="p-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors disabled:opacity-50"
+                    >
+                      {saving ? '...' : '✅'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setNewUsername(displayProfile.username);
+                        setError(null);
+                      }}
+                      className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                    >
+                      ❌
+                    </button>
+                  </div>
+                  {error && <p className="text-xs text-red-500">{error}</p>}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center sm:justify-start gap-3">
+                  <h1 className="text-3xl font-bold">{displayProfile.username}</h1>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="p-1.5 rounded-lg bg-white/5 text-[var(--text-secondary)] hover:text-white hover:bg-white/10 transition-all"
+                    title="Edit Username"
+                  >
+                    ✏️
+                  </button>
+                </div>
+              )}
               <p className="text-primary-400 font-medium">{displayProfile.title} · Level {displayProfile.level}</p>
               {displayProfile.createdAt && (
                 <p className="text-sm text-[var(--text-secondary)] mt-1">
@@ -192,6 +278,7 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
+
 
           {/* XP Bar */}
           <div className="mt-6">

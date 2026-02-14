@@ -285,13 +285,26 @@ body {
 .animate-spin-slow {
   animation: spin-slow 8s linear infinite;
 }
-@keyframes drift {
-  from { background-position: 0 0; }
-  to { background-position: 1000px 0; }
+@keyframes drift-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(100px); }
+}
+
+@keyframes drift-x-reverse {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100px); }
 }
 
 .animate-drift {
-  animation: drift 60s linear infinite;
+  animation: drift-x 30s ease-in-out infinite alternate;
+}
+
+.animate-drift-slow {
+  animation: drift-x 45s ease-in-out infinite alternate;
+}
+
+.animate-drift-fast {
+  animation: drift-x 20s ease-in-out infinite alternate;
 }
 
 .bg-checkered {
