@@ -1,26 +1,426 @@
 @import "tailwindcss";
 
+/* ============================================================
+   WARISANVERSE — Global Styles
+   Neo-Traditional Malaysia Design System
+   ============================================================ */
+
+@theme {
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+  --color-primary-800: #9a3412;
+  --color-primary-900: #7c2d12;
+
+  --color-neon-cyan: #00f5ff;
+  --color-neon-magenta: #ff00ff;
+  --color-neon-gold: #ffd700;
+  --color-neon-green: #39ff14;
+  --color-neon-purple: #bf00ff;
+
+  --color-surface-dark: #0a0a0f;
+  --color-surface-card: #13131a;
+  --color-surface-elevated: #1a1a25;
+  --color-surface-border: #2a2a3a;
+
+  --color-realm-congkak: #e67e22;
+  --color-realm-gasing: #3498db;
+  --color-realm-seremban: #9b59b6;
+  --color-realm-wau: #27ae60;
+}
+
+/* ---- Base ---- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #0a0a0f;
+  --bg-card: #13131a;
+  --bg-elevated: #1a1a25;
+  --text-primary: #f0f0f5;
+  --text-secondary: #8888aa;
+  --border-color: #2a2a3a;
+  --glow-primary: rgba(249, 115, 22, 0.3);
+  --glow-cyan: rgba(0, 245, 255, 0.3);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="light"] {
+  --bg-primary: #f5f0e8;
+  --bg-card: #ffffff;
+  --bg-elevated: #f8f4ec;
+  --text-primary: #1a1a2e;
+  --text-secondary: #666680;
+  --border-color: #d4c8b0;
+  --glow-primary: rgba(249, 115, 22, 0.15);
+  --glow-cyan: rgba(0, 150, 200, 0.15);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Outfit", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ---- Glassmorphism ---- */
+.glass {
+  background: rgba(19, 19, 26, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.glass-strong {
+  background: rgba(19, 19, 26, 0.85);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ---- Neon Glow Effects ---- */
+.neon-glow {
+  box-shadow:
+    0 0 15px var(--glow-primary),
+    0 0 30px rgba(249, 115, 22, 0.1);
+}
+
+.neon-cyan-glow {
+  box-shadow:
+    0 0 15px var(--glow-cyan),
+    0 0 30px rgba(0, 245, 255, 0.1);
+}
+
+.neon-text {
+  text-shadow:
+    0 0 10px var(--glow-primary),
+    0 0 20px rgba(249, 115, 22, 0.2);
+}
+
+.neon-text-cyan {
+  text-shadow:
+    0 0 10px var(--glow-cyan),
+    0 0 20px rgba(0, 245, 255, 0.2);
+}
+
+/* ---- Batik Pattern ---- */
+.batik-bg {
+  position: relative;
+}
+
+.batik-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image:
+    radial-gradient(circle at 25% 25%, #f97316 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, #f97316 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, #00f5ff 0.5px, transparent 0.5px);
+  background-size:
+    40px 40px,
+    40px 40px,
+    20px 20px;
+  pointer-events: none;
+}
+
+[data-theme="light"] .batik-bg::before {
+  opacity: 0.06;
+}
+
+.batik-border {
+  border-image: repeating-linear-gradient(
+      45deg,
+      #f97316 0,
+      #f97316 3px,
+      transparent 3px,
+      transparent 8px,
+      #00f5ff 8px,
+      #00f5ff 11px,
+      transparent 11px,
+      transparent 16px
+    )
+    10;
+}
+
+/* ---- Card Styles ---- */
+.game-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.game-card:hover {
+  border-color: rgba(249, 115, 22, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 15px var(--glow-primary);
+  transform: translateY(-4px);
+}
+
+/* ---- Realm-specific card glow ---- */
+.realm-congkak:hover {
+  border-color: rgba(230, 126, 34, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(230, 126, 34, 0.3);
+}
+
+.realm-gasing:hover {
+  border-color: rgba(52, 152, 219, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(52, 152, 219, 0.3);
+}
+
+.realm-seremban:hover {
+  border-color: rgba(155, 89, 182, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(155, 89, 182, 0.3);
+}
+
+.realm-wau:hover {
+  border-color: rgba(39, 174, 96, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(39, 174, 96, 0.3);
+}
+
+/* ---- Animations ---- */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--glow-primary);
+  }
+  50% {
+    box-shadow:
+      0 0 25px var(--glow-primary),
+      0 0 50px rgba(249, 115, 22, 0.1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes kite-sway {
+  0%,
+  100% {
+    transform: rotate(-5deg) translateY(0);
+  }
+  25% {
+    transform: rotate(3deg) translateY(-5px);
+  }
+  50% {
+    transform: rotate(-3deg) translateY(-8px);
+  }
+  75% {
+    transform: rotate(5deg) translateY(-3px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+@keyframes drift {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 0; }
+}
+
+.animate-drift {
+  animation: drift 60s linear infinite;
+}
+
+.bg-checkered {
+  background-image: 
+    linear-gradient(45deg, #ddd 25%, transparent 25%), 
+    linear-gradient(-45deg, #ddd 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #ddd 75%), 
+    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: #fff;
+}
+
+/* ---- Gradient Text ---- */
+.gradient-text {
+  background: linear-gradient(135deg, #f97316, #00f5ff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #ffd700, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---- Game Board Styles ---- */
+.congkak-pit {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #2a1f0a, #1a1200);
+  border: 2px solid #8b6914;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.congkak-pit:hover:not(.disabled) {
+  border-color: #f97316;
+  box-shadow:
+    inset 0 4px 8px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(249, 115, 22, 0.4);
+  transform: scale(1.05);
+}
+
+.congkak-pit.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.congkak-store {
+  width: 80px;
+  height: 160px;
+  border-radius: 40px;
+  background: radial-gradient(circle, #3a2f1a, #2a1f0a);
+  border: 2px solid #a07828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.gasing-arena {
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a1a2e, #0a0a1e);
+  border: 3px solid #3498db;
+  box-shadow:
+    0 0 30px rgba(52, 152, 219, 0.3),
+    inset 0 0 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.gasing-spinner {
+  border-radius: 50%;
+  position: absolute;
+  transition: none;
+}
+
+/* ---- Progress Bar ---- */
+.xp-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f97316, #ffd700);
+  transition: width 0.5s ease;
+}
+
+/* ---- Tier Colors ---- */
+.tier-bronze {
+  color: #cd7f32;
+}
+.tier-silver {
+  color: #c0c0c0;
+}
+.tier-gold {
+  color: #ffd700;
+}
+.tier-platinum {
+  color: #00ced1;
+}
+.tier-diamond {
+  color: #b9f2ff;
+}
+.tier-legend {
+  color: #ff4500;
+  text-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .congkak-pit {
+    width: 44px;
+    height: 44px;
+  }
+  .congkak-store {
+    width: 56px;
+    height: 120px;
+    border-radius: 28px;
+  }
 }
