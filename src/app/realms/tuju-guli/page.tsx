@@ -135,25 +135,42 @@ export default function TujuGuliPage() {
 
   if (phase === 'menu') {
       return (
-          <div className="min-h-screen bg-slate-800 flex items-center justify-center p-4">
-              <div className="game-card max-w-md w-full text-center p-8 bg-white rounded-xl shadow-2xl">
-                  <h1 className="text-4xl font-bold mb-2 text-green-700 border-b-4 border-green-600 pb-2 inline-block">TUJU GULI</h1>
-                  <p className="text-gray-600 mb-8 mt-4 font-serif">"The Marble Master"</p>
+          <div className="min-h-screen batik-bg flex items-center justify-center p-4">
+              <div className="game-card max-w-sm w-full text-center p-8 glass-strong rounded-2xl shadow-2xl relative overflow-hidden">
+                  {/* Decorative background element */}
+                  <div className="absolute -top-24 -right-24 w-48 h-48 bg-green-600/10 rounded-full blur-3xl" />
                   
-                  <div className="space-y-4 mb-8 text-left bg-gray-100 p-4 rounded-lg text-sm border-l-4 border-yellow-500">
-                      <p>🎱 <strong>How to Play:</strong></p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  <h1 className="text-4xl font-black mb-2 text-primary border-b-4 border-green-600 pb-2 inline-block relative">
+                      TUJU <span className="text-green-500">GULI</span>
+                  </h1>
+                  <p className="text-secondary mb-8 mt-4 font-medium italic">"The Marble Master"</p>
+                  
+                  <div className="space-y-4 mb-10 text-left glass p-5 rounded-xl text-sm border-l-4 border-yellow-500 transition-all">
+                      <p className="text-primary font-bold flex items-center gap-2">
+                          <span className="text-xl">🎱</span> How to Play:
+                      </p>
+                      <ul className="list-disc pl-5 space-y-2 text-secondary">
                            <li>Take turns with the AI to knock marbles out.</li>
-                          <li>Drag your white striker to aim and shoot.</li>
-                          <li>Each marble knocked out is 1 point.</li>
-                          <li>Most points wins!</li>
+                          <li>Drag your <span className="text-primary font-bold">white striker</span> to aim and shoot.</li>
+                          <li>Each marble knocked out is <span className="text-green-500 font-bold">1 point</span>.</li>
+                          <li>Most points wins the match!</li>
                       </ul>
                   </div>
 
-                  <button onClick={startGame} className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xl shadow-lg transition transform active:scale-95">
-                      START BATTLE
-                  </button>
-                  <Link href="/realms" className="block mt-4 text-gray-500 hover:text-gray-800">Exit</Link>
+                  <div className="space-y-4">
+                      <button 
+                        onClick={startGame} 
+                        className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl text-xl shadow-[0_0_20px_rgba(22,163,74,0.3)] transition-all transform hover:scale-[1.02] active:scale-95"
+                      >
+                          START BATTLE
+                      </button>
+                      <Link 
+                        href="/realms" 
+                        className="block py-2 text-secondary hover:text-primary transition-colors text-sm font-medium"
+                      >
+                        ← Exit Arena
+                      </Link>
+                  </div>
               </div>
           </div>
       );
