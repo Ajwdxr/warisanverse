@@ -165,7 +165,7 @@ export default function LawanPemadamPage() {
   if (phase === 'menu') {
       return (
           <div className="min-h-screen batik-bg flex items-center justify-center p-4">
-              <div className="game-card max-sm w-full text-center p-8 glass-strong rounded-2xl shadow-2xl relative overflow-hidden">
+              <div className="game-card max-w-md w-full text-center p-8 glass-strong rounded-2xl shadow-2xl relative overflow-hidden">
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl" />
                   <h1 className="text-4xl font-black mb-2 text-primary border-b-4 border-red-600 pb-2 inline-block relative">
                     LAWAN <span className="text-blue-500">PEMADAM</span>
