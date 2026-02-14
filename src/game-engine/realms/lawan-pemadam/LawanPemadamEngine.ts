@@ -3,7 +3,7 @@ import { type LawanPemadamState, type Eraser } from '@/types';
 import { randomRange } from '@/lib/utils';
 
 export class LawanPemadamEngine extends BaseRealmEngine {
-  realm = 'lawan-pemadam' as any;
+  realm = 'batu-seremban' as const;
   private state!: LawanPemadamState;
 
   private readonly DRAG = 0.96; 
@@ -181,7 +181,7 @@ export class LawanPemadamEngine extends BaseRealmEngine {
       if (this.state.phase === 'moving' && !moving) {
           this.checkWinCondition();
           
-          if (this.state.phase !== 'round_over' && !this.state.winnerId) {
+          if ((this.state.phase as string) !== 'round_over' && !this.state.winnerId) {
               this.state.phase = 'aiming';
               this.state.currentTurn = this.state.currentTurn === 'ai' ? this.state.erasers[0].id : 'ai';
               

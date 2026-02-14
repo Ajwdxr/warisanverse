@@ -269,6 +269,7 @@ export interface BatuStone {
   id: number;
   x: number;
   y: number;
+  location: 'floor' | 'hand' | 'air';
   isSelected: boolean; // For picking
 }
 

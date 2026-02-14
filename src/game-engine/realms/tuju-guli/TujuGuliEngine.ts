@@ -2,7 +2,7 @@ import { BaseRealmEngine, type GameConfig } from '../../types';
 import { type TujuGuliState, type Marble } from '@/types';
 
 export class TujuGuliEngine extends BaseRealmEngine {
-  realm = 'wau-bulan' as any; // Using wau-bulan ID for compatibility
+  realm = 'wau-bulan' as const; // Using wau-bulan ID for compatibility
   private state!: TujuGuliState;
 
   private readonly ARENA_RADIUS = 300;

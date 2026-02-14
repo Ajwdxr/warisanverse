@@ -3,7 +3,7 @@ import { type LariGuniState, type LariGuniPlayer } from '@/types';
 import { randomRange } from '@/lib/utils';
 
 export class LariGuniEngine extends BaseRealmEngine {
-  realm = 'lari-dalam-guni' as any; // Allow flexibility for now
+  realm = 'gasing' as const; // Allow flexibility for now
   private state!: LariGuniState;
 
   // Physics Constants
