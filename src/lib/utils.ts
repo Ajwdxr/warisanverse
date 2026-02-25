@@ -61,18 +61,13 @@ export function getWinRate(wins: number, total: number): number {
 }
 
 export function getRealmRoute(realm: string): string {
-  const routes: Record<string, string> = {
-    'gasing': 'lari-dalam-guni',
-    'batu-seremban': 'lawan-pemadam',
-    'wau-bulan': 'tuju-guli',
-    'teka-silang-kata': 'teka-silang-kata',
-  };
-  return `/realms/${routes[realm] || realm}`;
+  // Routes now match identifiers
+  return `/realms/${realm}`;
 }
 
 export function getRealmClass(realm: string): string {
   const classes: Record<string, string> = {
-    'gasing': 'guni',
+    'gasing': 'guni', // Keeps specific class for background styles
     'batu-seremban': 'pemadam',
     'wau-bulan': 'guli',
     'congkak': 'congkak',

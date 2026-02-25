@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { TujuGuliEngine } from '@/game-engine/realms/tuju-guli/TujuGuliEngine';
+import { TujuGuliEngine } from '@/game-engine/realms/wau-bulan/TujuGuliEngine';
 import { createClient } from '@/lib/supabase/client';
 import { submitGameResult } from '@/lib/game-actions';
 import { type TujuGuliState, type Marble } from '@/types';

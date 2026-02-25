@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { REALM_INFO } from '@/lib/constants';
+import { getRealmRoute, getRealmClass } from '@/lib/utils';
 import { type RealmName } from '@/types';
 
 const realms = Object.entries(REALM_INFO) as [RealmName, typeof REALM_INFO[RealmName]][];
@@ -97,7 +98,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`game-card realm-${key === 'batu-seremban' ? 'seremban' : key === 'wau-bulan' ? 'wau' : key} p-8 relative overflow-hidden group`}
+                className={`game-card ${getRealmClass(key)} p-8 relative overflow-hidden group`}
               >
                 <div className="absolute top-0 right-0 w-40 h-40 opacity-5 text-8xl flex items-start justify-end p-4 pointer-events-none">
                   {realm.icon}

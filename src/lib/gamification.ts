@@ -202,6 +202,20 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
     },
   },
   {
+    key: 'crossword_wizard',
+    name: 'Crossword Wizard',
+    description: 'Complete 30 levels of Teka Silang Kata',
+    category: 'teka-silang-kata',
+    rarity: 'epic',
+    xpReward: 300,
+    goldReward: 150,
+    icon: '📝',
+    condition: (_, progress) => {
+      const p = progress.find((p) => p.realm_name === 'teka-silang-kata');
+      return (p?.wins || 0) >= 30;
+    },
+  },
+  {
     key: 'level_10',
     name: 'Veteran',
     description: 'Reach Level 10',

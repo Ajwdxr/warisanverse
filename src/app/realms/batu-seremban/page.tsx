@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { LawanPemadamEngine } from '@/game-engine/realms/lawan-pemadam/LawanPemadamEngine';
+import { LawanPemadamEngine } from '@/game-engine/realms/batu-seremban/LawanPemadamEngine';
 import { createClient } from '@/lib/supabase/client';
 import { submitGameResult } from '@/lib/game-actions';
 import { type LawanPemadamState } from '@/types';

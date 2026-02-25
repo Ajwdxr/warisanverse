@@ -18,6 +18,7 @@ const MAX_SCORES: Record<RealmName, number> = {
   gasing: 2000,
   'batu-seremban': 50000,
   'wau-bulan': 100000,
+  'teka-silang-kata': 1000,
 };
 
 // Minimum plausible match duration in seconds
@@ -26,6 +27,7 @@ const MIN_MATCH_DURATION: Record<RealmName, number> = {
   gasing: 10,
   'batu-seremban': 15,
   'wau-bulan': 5,
+  'teka-silang-kata': 5,
 };
 
 // Maximum matches per hour to prevent farming

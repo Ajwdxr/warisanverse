@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { LariGuniEngine } from '@/game-engine/realms/lari-dalam-guni/LariGuniEngine'; // Import failure? Need to check path
+import { LariGuniEngine } from '@/game-engine/realms/gasing/LariGuniEngine'; // Import failure? Need to check path
 import { createClient } from '@/lib/supabase/client';
 import { submitGameResult } from '@/lib/game-actions';
 import { type LariGuniState, type LariGuniPlayer } from '@/types';
