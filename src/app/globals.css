@@ -209,6 +209,20 @@ body {
     0 0 20px rgba(39, 174, 96, 0.3);
 }
 
+.realm-crossword:hover {
+  border-color: rgba(155, 89, 182, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(155, 89, 182, 0.3);
+}
+
+.crossword-pattern {
+  background-image: 
+    linear-gradient(rgba(155, 89, 182, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 89, 182, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 /* ---- Animations ---- */
 @keyframes float {
   0%,

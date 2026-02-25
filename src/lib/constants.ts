@@ -66,6 +66,19 @@ export const REALM_INFO: Record<RealmName, {
     playerCount: '1 Player',
     loreIntro: 'Tuju Guli requires a sharp eye and steady hand. It was the test of accuracy for every village child.',
   },
+  'teka-silang-kata': {
+    name: 'Teka Silang Kata',
+    subtitle: 'Malay Word Realm',
+    description: 'Test your vocabulary in this traditional Malay crossword puzzle. Complete words to earn EXP and master the language of heritage.',
+    icon: '📝',
+    color: '#9B59B6',
+    gradient: 'from-purple-500 via-violet-600 to-indigo-700',
+    bgPattern: 'crossword-pattern',
+    features: ['Malay Only', 'Level Progression', 'Time Challenge', 'Heritage Vocabulary'],
+    difficulty: 'Medium',
+    playerCount: '1 Player',
+    loreIntro: 'Language is the soul of the nation. Teka Silang Kata has long been the favorite pastime in Malay households, bridging knowledge and fun.',
+  },
 };
 
 // ---- Season ----
@@ -79,6 +92,9 @@ export const XP_PER_LOSS = 10;
 export const XP_PER_DRAW = 15;
 export const GOLD_PER_WIN = 20;
 export const GOLD_PER_LOSS = 5;
+
+export const CROSSWORD_EXP_PER_WORD = 5;
+export const CROSSWORD_EXP_LEVEL_BONUS = 50;
 
 // ---- Game Constants ----
 export const CONGKAK_PITS = 7;

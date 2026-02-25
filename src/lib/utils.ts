@@ -65,6 +65,7 @@ export function getRealmRoute(realm: string): string {
     'gasing': 'lari-dalam-guni',
     'batu-seremban': 'lawan-pemadam',
     'wau-bulan': 'tuju-guli',
+    'teka-silang-kata': 'teka-silang-kata',
   };
   return `/realms/${routes[realm] || realm}`;
 }
@@ -75,6 +76,7 @@ export function getRealmClass(realm: string): string {
     'batu-seremban': 'pemadam',
     'wau-bulan': 'guli',
     'congkak': 'congkak',
+    'teka-silang-kata': 'crossword',
   };
   return `realm-${classes[realm] || realm}`;
 }

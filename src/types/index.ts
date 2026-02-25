@@ -115,7 +115,36 @@ export interface LoreUnlock {
 }
 
 // ---- Enums / Unions ----
-export type RealmName = "congkak" | "gasing" | "batu-seremban" | "wau-bulan";
+export type RealmName = "congkak" | "gasing" | "batu-seremban" | "wau-bulan" | "teka-silang-kata";
+
+// Teka Silang Kata (Crossword)
+export interface TekaSilangKataState {
+  levelId: string;
+  grid: string[][]; // Current player input
+  completedWords: string[]; // List of word IDs completed
+  isGameOver: boolean;
+  score: number;
+  timeLeft: number;
+}
+
+export interface CrosswordWord {
+  id: string;
+  answer: string;
+  hint: string;
+  row: number;
+  col: number;
+  direction: 'across' | 'down';
+  length: number;
+}
+
+export interface CrosswordLevel {
+  id: string;
+  name: string;
+  difficulty: 'Mudah' | 'Sederhana' | 'Sukar';
+  size: number; // grid size (e.g. 10 for 10x10)
+  words: CrosswordWord[];
+  timeLimit: number;
+}
 export type GameMode = "solo" | "ai" | "ranked" | "casual";
 export type MatchStatus = "in_progress" | "completed" | "abandoned" | "draw";
 export type RoomStatus = "waiting" | "ready" | "playing" | "finished";
